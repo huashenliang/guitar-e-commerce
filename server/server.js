@@ -26,9 +26,36 @@ app.use(bodyParser.json());
 app.use(cookiParser());
 
 
+
 //---------------------------
 //Products
 //---------------------------
+app.get('/api/product/guitar_by_id', (req,res) => {
+    let type = req.query.type;
+    let items = req.query.id;
+
+    if(type === "array"){
+        let ids = req.query.id.split(',');
+        items = [];
+        items = ids.map(i => {
+            return mongoose.Types.ObjectId(i)
+        })
+    }
+
+    //populate using 'ref'in the product schema
+    Product.find({
+        '_id': {$in: items}
+    }).
+    populate('brand').
+    populate('wood').
+    exec(
+        (err,docs)=>{
+            return res.status(200).send(docs)
+        }
+    )
+})
+
+
 app.post('/api/product/guitar', auth, admin, (req,res) => {
     const product = new Product(req.body);
 
