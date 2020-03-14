@@ -30,6 +30,27 @@ app.use(cookiParser());
 //---------------------------
 //Products
 //---------------------------
+app.get('/api/product/guitars', (req, res) => {
+
+    //if dont have the value, will use hte default one 
+    let order = req.query.order ? req.query.order : 'asc';
+    let sortBy = req.query.sortBy ? req.query.sortBy : '_id';
+    let limit = req.query.limit ? req.query.limit : 100;
+
+    Product.find().
+    populate('brand').
+    populate('wood').
+    sort([[sortBy,order]]).
+    limit(parseInt(limit)).
+    exec((err, guitars) => {
+        if(err) return res.status(400).send(err);
+        res.send(guitars)
+    })
+
+})
+
+
+//get products by product id 
 app.get('/api/product/guitar_by_id', (req,res) => {
     let type = req.query.type;
     let items = req.query.id;
@@ -55,7 +76,7 @@ app.get('/api/product/guitar_by_id', (req,res) => {
     )
 })
 
-
+//
 app.post('/api/product/guitar', auth, admin, (req,res) => {
     const product = new Product(req.body);
 
@@ -190,9 +211,6 @@ app.get('/api/user/logout', auth, (req,res) => {
         }
     )
 })
-
-
-
 
 
 const port = process.env.PORT || 3002;
