@@ -21,9 +21,11 @@ app.use(bodyParser.json());
 app.use(cookiParser());
 
 
-
+//---------------------------
 //USERS
+//---------------------------
 
+//check for auth
 app.get('/api/users/auth', auth, (req,res) => {
     //these data will be used later for the react part
     res.status(200).json({
@@ -39,6 +41,7 @@ app.get('/api/users/auth', auth, (req,res) => {
 })
 
 
+//register a user
 app.post('/api/users/register', (req,res) => {
     const user = new User(req.body);
 
@@ -53,15 +56,18 @@ app.post('/api/users/register', (req,res) => {
 
 })
 
+//user login
 app.post('/api/users/login',(req,res) => {
 
     //find the email
     User.findOne({'email': req.body.email}, (err, user) => {
         if(!user) return res.json({loginSucess: false, message:'Auth failed, email not found'})
 
+        //check password
         user.comparepassword(req.body.password, (err, isMatch)=> {
             if(!isMatch) return res.json({loginSucess: false, message:'Wrong password!'})
 
+            //generate a token
             user.generateToken((err, user) => {
                 if(err) return res.status(400).send(err);
                 res.cookie('w_auth', user.token).status(200).json({
@@ -70,11 +76,38 @@ app.post('/api/users/login',(req,res) => {
             })
         })
     })
-
-    //check password
-
-    //generate a token
 })
+
+
+//User logout
+//the user can only log out if they are authenticated
+
+app.get('/api/user/logout', auth, (req,res) => {
+    
+    User.findOneAndUpdate(
+        {_id: req.user._id},
+        {token: ''},
+        (err,doc)=>{
+            if(err) return res.json({success:false,err})
+            return res.status(200).send({
+                success:true
+            })
+        }
+    )
+})
+
+
+
+//---------------------------
+//Brand
+//---------------------------
+
+app.post('api/product/brand', auth, (req,res) => {
+    
+})
+
+
+
 
 
 const port = process.env.PORT || 3002;

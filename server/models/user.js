@@ -91,6 +91,7 @@ userSechema.methods.generateToken = function(cb) {
     })
 }
 
+
 userSechema.statics.findByToken = function(token, cb) {
     var user = this ;
 
