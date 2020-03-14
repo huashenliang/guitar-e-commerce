@@ -1,14 +1,16 @@
-const express =require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
-const cookiParser =require('cookie-parser');
+const cookiParser = require('cookie-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
 //Models
-const {User} =require('./models/user');
+const {User} = require('./models/user');
+const {Brand} = require('./models/brand');
 
 //middlewares
-const {auth} =require('./middleware/auth');
+const {auth} = require('./middleware/auth');
+const {admin} = require('./middleware/admin');
 
 const app = express();
 
@@ -19,6 +21,32 @@ mongoose.connect(process.env.DATABASE)
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookiParser());
+
+
+//---------------------------
+//Brand
+//---------------------------
+app.post('/api/product/brand', auth, admin, (req,res) => {
+    const brand = new Brand(req.body);
+
+    brand.save((err,doc) => {
+        if(err) return res.json({success: false,err});
+        res.status(200).json({
+            success: true,
+            brand: doc
+        })
+    })
+})
+
+app.get('/api/product/getbrands', (req,res) => {
+    Brand.find({}, (err, brands) => {
+        if(err) return res.status(400).send(err)
+        res.status(200).send(brands)
+
+    })
+})
+
+
 
 
 //---------------------------
@@ -81,7 +109,6 @@ app.post('/api/users/login',(req,res) => {
 
 //User logout
 //the user can only log out if they are authenticated
-
 app.get('/api/user/logout', auth, (req,res) => {
     
     User.findOneAndUpdate(
@@ -94,16 +121,6 @@ app.get('/api/user/logout', auth, (req,res) => {
             })
         }
     )
-})
-
-
-
-//---------------------------
-//Brand
-//---------------------------
-
-app.post('api/product/brand', auth, (req,res) => {
-    
 })
 
 
