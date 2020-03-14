@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const cookiParser =require('cookie-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const {User} =require('./models/user');
+
+
 
 const app = express();
 
@@ -15,9 +18,23 @@ app.use(bodyParser.json());
 app.use(cookiParser());
 
 
+//Models
+
+
 //USERS
 app.post('/api/users/register', (req,res) => {
-    res.send(200);
+    const user = new User(req.body);
+
+
+    //saving to mongodb
+    user.save((err, doc) => {
+        if(err) return res.json({success:false,err})   
+        res.status(200).json({
+            success:true,
+            userData:doc
+        })
+     })
+
 })
 
 
