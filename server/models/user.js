@@ -66,7 +66,9 @@ userSechema.pre('save', function(next) {
     }
 })
 
+//---------------------------------
 //creating function in userSechema
+//---------------------------------
 userSechema.methods.comparepassword = function(userPassword, cb) {
     bcrypt.compare(userPassword, this.password, (err,isMatch) => {
         if(err) return cb(err);
@@ -80,12 +82,28 @@ userSechema.methods.generateToken = function(cb) {
     // user.id + password of env-> generate token 
     var token = jwt.sign(user._id.toHexString(), process.env.SECRET)
     user.token = token;
+
     console.log('Generated token', user.token)
+
     user.save(function(err, user){
         if(err) return cb(err);
         cb(null, user)
     })
 }
+
+userSechema.statics.findByToken = function(token, cb) {
+    var user = this ;
+
+    //verify if the token is correct
+    jwt.verify(token, process.env.SECRET, function(err, decode) {
+        user.findOne({"_id": decode,"token":token}, function(err,user){
+            if(err) return cb(err);
+            cb(null,user);
+        })
+    })
+}
+
+
 
 const User = mongoose.model('User', userSechema);
 
