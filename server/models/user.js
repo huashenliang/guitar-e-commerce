@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const SALT_I = 10;
-
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 //creating sechema for user
 const userSechema = mongoose.Schema({
@@ -63,10 +64,28 @@ userSechema.pre('save', function(next) {
     } else{
         next()
     }
-
-  
 })
 
+//creating function in userSechema
+userSechema.methods.comparepassword = function(userPassword, cb) {
+    bcrypt.compare(userPassword, this.password, (err,isMatch) => {
+        if(err) return cb(err);
+        cb(null, isMatch)
+    })
+}
+
+userSechema.methods.generateToken = function(cb) {
+    var user = this;
+    
+    // user.id + password of env-> generate token 
+    var token = jwt.sign(user._id.toHexString(), process.env.SECRET)
+    user.token = token;
+    console.log('Generated token', user.token)
+    user.save(function(err, user){
+        if(err) return cb(err);
+        cb(null, user)
+    })
+}
 
 const User = mongoose.model('User', userSechema);
 
