@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const SALT_I = 10;
 
 
 //creating sechema for user
@@ -40,6 +42,31 @@ const userSechema = mongoose.Schema({
         type: String
     }
 })
+
+//before saving to the db, hash the password, (changed to ES5 cos ES6 won't work for some reason)
+userSechema.pre('save', function(next) {
+    var user =this;
+
+    //isModified from mongo
+    //check if the user is changing the password
+    if(user.isModified('password')){
+        bcrypt.genSalt(SALT_I, (err, salt) => {
+            if(err) return next(err);
+    
+            //hasing the user password
+            bcrypt.hash(user.password, salt, function(err, hash) {
+                if(err) return next(err);
+                user.password = hash;
+                next();
+            });
+        })
+    } else{
+        next()
+    }
+
+  
+})
+
 
 const User = mongoose.model('User', userSechema);
 
