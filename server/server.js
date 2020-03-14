@@ -7,6 +7,9 @@ require('dotenv').config();
 //Models
 const {User} = require('./models/user');
 const {Brand} = require('./models/brand');
+const {Wood} = require('./models/wood');
+const {Product} = require('./models/product');
+
 
 //middlewares
 const {auth} = require('./middleware/auth');
@@ -21,6 +24,46 @@ mongoose.connect(process.env.DATABASE)
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookiParser());
+
+
+//---------------------------
+//Products
+//---------------------------
+app.post('/api/product/guitar', auth, admin, (req,res) => {
+    const product = new Product(req.body);
+
+    product.save((err,doc) => {
+        if(err) return res.json({success:false, err})
+        res.status(200).json({
+            success: true,
+            guitar: doc
+        })
+    })
+
+})
+
+
+//---------------------------
+//Woods
+//---------------------------
+app.post('/api/product/wood', auth, admin, (req,res) => {
+    const wood = new Wood(req.body);
+
+    wood.save((err,doc) => {
+        if(err) return res.json({success:false, err})
+        res.status(200).json({
+            success: true,
+            wood: doc
+        })
+    })
+})
+
+app.get('/api/product/getWoods',  (req,res) => {
+    Wood.find({},(err, woods)=>{
+        if (err) return res.status(400).send(err);
+        res.status(200).send(woods)
+    })
+})
 
 
 //---------------------------
@@ -45,8 +88,6 @@ app.get('/api/product/getbrands', (req,res) => {
 
     })
 })
-
-
 
 
 //---------------------------
