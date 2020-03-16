@@ -11,6 +11,13 @@ export const validate = (element, formdata=[]) => {
     //default 
     let error = [true, '']
 
+    //validating if the user input the same password
+    if(element.validation.confirm){
+        const valid = element.value.trim() === formdata[element.validation.confirm].value;
+        const message = `${!valid ? 'Passwords do not match' : ''}`
+        error = !valid ? [valid, message] : error
+    }
+
     //validating email 
     if(element.validation.email){
            const valid = validateEmail(element.value)
@@ -67,7 +74,10 @@ export const generateData = (formData, formName) => {
 
     //will return data in key value pair 
     for (let key in formData) {
-        dataToSubmit[key] = formData[key].value;
+        //do not submit the data in confirm password field to the db 
+        if(key !== 'confirmPassword') {
+            dataToSubmit[key] = formData[key].value;
+        }
     }
 
     return dataToSubmit;
