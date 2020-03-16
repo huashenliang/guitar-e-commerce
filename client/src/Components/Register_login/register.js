@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import FormField from '../utils/Form/formfield';
 import { update, generateData, isFormValid} from '../utils/Form/formActions';
 import {connect} from 'react-redux';
-import {} from '../../actions/user_actions';
+import {registerUser} from '../../actions/user_actions';
 import { withRouter } from 'react-router-dom';
-
+import Dialog from '@material-ui/core/Dialog';
 
 class Register extends Component {
     state = { 
         formError: false,
-        formSuccess:'',
+        formSuccess:false,
         formdata:{
             name: {
                 element: 'input',
@@ -103,11 +103,23 @@ class Register extends Component {
         
         console.log(formIsValid)
         if(formIsValid){
-           console.log(dataToSubmit)
+            this.props.dispatch(registerUser(dataToSubmit)).then(response => {
+                if(response.payload.success){
+                    this.setState({
+                        formError: false,
+                        formSuccess: true
+                    });
+                    //after 3 seconds
+                    setTimeout(() => {
+                        this.props.history.push('/register_login');
+                    }, 3000)
+                }else{
+                    this.setState({formError: true})
+                }
+
+            }).catch(e=>{ this.setState({formError: true}) })
         }else{
-            this.setState({
-                formError: true
-                })
+            this.setState({formError: true})
         }
     }
 
@@ -192,6 +204,15 @@ class Register extends Component {
                         </div>
                     </div>
                 </div>
+
+                <Dialog open={this.state.formSuccess}>
+                    <div className="dialog_alert">
+                        <div>Congratulations !!</div>
+                        <div>
+                            You will be redirected to the LOGIN in a couple seconds....
+                        </div>
+                    </div>
+                </Dialog>
             </div>
          );
     }
