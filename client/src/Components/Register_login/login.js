@@ -1,24 +1,25 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import FormField from '../utils/Form/formfield';
-import { update} from '../utils/Form/formActions';
+import { update, generateData, isFormValid} from '../utils/Form/formActions';
 
 class Login extends Component {
     
     //state for form and password in the login form
-    state = { 
+    
+    state = {
         formError: false,
-        formSucess: '',
-        formdata: {
-            email:{
+        formSuccess:'',
+        formdata:{
+            email: {
                 element: 'input',
                 value: '',
-                config: {
+                config:{
                     name: 'email_input',
                     type: 'email',
-                    placehodler: 'Enter your email'
+                    placeholder: 'Enter your email'
                 },
-                validation: {
+                validation:{
                     required: true,
                     email: true
                 },
@@ -26,15 +27,15 @@ class Login extends Component {
                 touched: false,
                 validationMessage:''
             },
-            password:{
+            password: {
                 element: 'input',
                 value: '',
-                config: {
+                config:{
                     name: 'password_input',
                     type: 'password',
-                    placehodler: 'Enter your password'
+                    placeholder: 'Enter your password'
                 },
-                validation: {
+                validation:{
                     required: true
                 },
                 valid: false,
@@ -45,10 +46,26 @@ class Login extends Component {
 
      }
 
-    submitForm = () => {
+    //submitting the form 
 
+    submitForm = (event) => {
+        event.preventDefault();
+        //convert the data form 
+        let dataToSubmit = generateData(this.state.formdata, 'login');
+        //checking if the form is vaild before submitting
+        let formIsValid = isFormValid(this.state.formdata, 'login');
+   
+        if(formIsValid){
+            console.log(dataToSubmit)
+        }else{
+            this.setState({
+                formError: true
+            })
+        }
+      
     }
 
+    //update the form 
     updateForm = (element) => {
         const newFormdata = update(element, this.state.formdata, 'login');
         this.setState({
@@ -76,7 +93,15 @@ class Login extends Component {
                         
                     />
 
-
+                    {/* if the formError is false, will display error message  */}
+                    { this.state.formError ?
+                        <div className="error_label">
+                            Please check your data
+                        </div>
+                    :null}
+                    <button onClick={(event) => this.submitForm(event)}>
+                        LOG IN
+                    </button>
 
                 </form>
             </div>
