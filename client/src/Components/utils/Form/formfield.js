@@ -12,6 +12,7 @@ const Formfield = ({formdata, change, id}) => {
                     {formdata.validationMessage}
                 </div>
 
+
             )
         }
 
@@ -20,8 +21,6 @@ const Formfield = ({formdata, change, id}) => {
 
     const renderTemplate = () => {
         let formTemplate = null;
-        
-        console.log(formdata.element)
         
         switch(formdata.element){
 

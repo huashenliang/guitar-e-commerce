@@ -5,8 +5,7 @@ const MyButton = (props) => {
     
     const buttons = () => {
         let template = ''
-        
-        console.log(props)
+
         switch(props.type) {
             case "default":
                 template= <Link
