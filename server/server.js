@@ -30,6 +30,10 @@ app.use(cookiParser());
 //---------------------------
 //Products
 //---------------------------
+
+//By arrival ->sortBy=createdAt
+//By sell - sortBy=sold
+
 app.get('/api/product/guitars', (req, res) => {
 
     //if dont have the value, will use hte default one 
