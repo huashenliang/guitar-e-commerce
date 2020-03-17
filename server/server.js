@@ -198,7 +198,7 @@ app.post('/api/users/login',(req,res) => {
 
 //User logout
 //the user can only log out if they are authenticated
-app.get('/api/user/logout', auth, (req,res) => {
+app.get('/api/users/logout', auth, (req,res) => {
     
     User.findOneAndUpdate(
         {_id: req.user._id},
