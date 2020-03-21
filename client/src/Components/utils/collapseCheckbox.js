@@ -20,6 +20,7 @@ class CollapseCheckbox extends Component {
 
 
     componentDidMount() {
+        console.log(this.props.list)
         if(this.props.initState){
             this.setState({
                 open: this.props.initState
@@ -44,6 +45,48 @@ class CollapseCheckbox extends Component {
             />
     )
 
+    
+    renderList = () => (
+     
+        this.props.list ?
+            this.props.list.map((value)=>(
+                <ListItem key={value._id} style={{padding:'10px 0'}}>
+                    <ListItemText primary={value.name}/>
+                    <ListItemSecondaryAction>
+                        <Checkbox
+                            color="primary"
+                            onChange={this.handleToggle(value._id)}
+                            checked={this.state.checked.indexOf(value._id) !== -1}
+                        />
+                    </ListItemSecondaryAction>
+                </ListItem>
+            ))
+        :null
+    )
+
+
+    handleToggle = value => () => {
+        const { checked } = this.state;
+        console.log(checked)
+
+        const currentIndex = checked.indexOf(value);
+        const newChecked = [...checked];
+
+        //-1 is checked
+        if(currentIndex === -1){
+            newChecked.push(value)
+        } else{
+            newChecked.splice(currentIndex,1)
+        }
+
+        this.setState({
+            checked: newChecked
+        },()=>{
+            this.props.handleFilters(newChecked)
+        })
+
+    }
+    
     render() { 
         return ( 
             <div className="collapse_items_wrapper">
@@ -55,6 +98,11 @@ class CollapseCheckbox extends Component {
                             />
                             {this.handleAngle()}
                         </ListItem>
+                        <Collapse in={this.state.open} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                {this.renderList()}
+                            </List>
+                        </Collapse>
                 </List>
             </div> 
         );
